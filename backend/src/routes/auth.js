@@ -6,6 +6,9 @@ import pool from "../config/db.js";
 const router = Router();
 
 router.post("/register", async (req, res) => {
+  if (process.env.ALLOW_REGISTRATION !== "true")
+    return res.status(403).json({ message: "User registration is disabled." });
+
   try {
     const { username, password, role, baseId } = req.body;
     if (!username || !password || !role)

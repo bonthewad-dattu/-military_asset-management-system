@@ -17,6 +17,7 @@ psql -U postgres -d military_assets -f backend/database/schema.sql
 ```
 
 Copy `backend/.env.example` to `backend/.env` and update the database credentials and JWT secret.
+Registration is disabled by default. To enable it for local demos only, set `ALLOW_REGISTRATION=true`.
 
 ## 2. Backend
 ```bash
@@ -34,6 +35,18 @@ npm install
 npm run dev
 ```
 Open the Vite URL shown in the terminal (normally http://localhost:5173).
+
+## Deploying on Render
+
+Deploy this project as three Render services:
+
+1. Create a PostgreSQL database. Run `backend/database/schema.sql` against it once using its external database URL.
+2. Create a **Web Service** from this repository with root directory `backend`, build command `npm install`, and start command `npm start`. Set `DATABASE_URL` to the database's internal URL, `JWT_SECRET` to a long random secret, `CLIENT_URL` to the frontend's Render URL, and `ALLOW_REGISTRATION` to `false`.
+3. Create a **Static Site** from this repository with root directory `frontend`, build command `npm install && npm run build`, and publish directory `dist`. Set `VITE_API_BASE_URL` to the backend's Render URL followed by `/api`.
+4. Once both services are deployed, set the backend's `CLIENT_URL` to the Static Site URL and redeploy the backend.
+5. Create the first administrator from the backend service shell with `npm run create-admin`. Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the shell environment for that command only; use a password of at least 12 characters and remove the variables afterward.
+
+Do not enable public registration or use real or sensitive operational data in a demo deployment.
 
 ## Important notes
 - The application is an MVP starter. Create users through the registration endpoint or insert test users using the documented role names.
