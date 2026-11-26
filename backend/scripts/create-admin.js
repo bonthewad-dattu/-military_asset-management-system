@@ -14,9 +14,15 @@ if (!username || !password) {
   try {
     const passwordHash = await bcrypt.hash(password, 12);
     const result = await pool.query(
-      "INSERT INTO users (username, password_hash, role) VALUES ($1, $2, 'ADMIN') RETURNING id, username",
-      [username, passwordHash],
-    );
+  `INSERT INTO users (username, password_hash, role)
+   VALUES ($1, $2, 'ADMIN')
+   ON CONFLICT (username)
+   DO UPDATE SET
+     password_hash = EXCLUDED.password_hash,
+     role = 'ADMIN'
+   RETURNING id, username`,
+  [username, passwordHash],
+);
     console.log(`Created admin account "${result.rows[0].username}".`);
   } catch (error) {
     console.error("Could not create admin account:", error.message);
